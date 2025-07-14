@@ -51,12 +51,14 @@ jobs:
     
     - name: Take screenshot
       run: |
-        sleep 10
+        sleep 15
         xcrun simctl io booted screenshot screenshot.png || echo "Screenshot failed"
+        ls -la screenshot.png || echo "Screenshot file not found"
     
     - name: Upload screenshot
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: ios-simulator-screenshot
-        path: screenshot.png 
+        path: screenshot.png
+        retention-days: 30 
