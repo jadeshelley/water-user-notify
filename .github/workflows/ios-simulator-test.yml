@@ -45,20 +45,32 @@ jobs:
       run: |
         xcrun simctl boot "iPhone 15" || xcrun simctl boot "iPhone 14"
     
-    - name: Install app on simulator
+    - name: Launch app and take screenshot
       run: |
-        flutter install -d "iPhone 15" || flutter install -d "iPhone 14"
-    
-    - name: Take screenshot
-      run: |
-        sleep 15
+        # Start flutter run in background
+        timeout 60 flutter run -d "iPhone 15" --debug &
+        FLUTTER_PID=$!
+        
+        # Wait for app to start
+        sleep 30
+        
+        # Take screenshot
         xcrun simctl io booted screenshot screenshot.png || echo "Screenshot failed"
         ls -la screenshot.png || echo "Screenshot file not found"
+        
+        # Wait a bit more and take another screenshot
+        sleep 10
+        xcrun simctl io booted screenshot screenshot2.png || echo "Second screenshot failed"
+        
+        # Kill flutter run
+        kill $FLUTTER_PID 2>/dev/null || echo "Flutter process already ended"
     
-    - name: Upload screenshot
+    - name: Upload screenshots
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: ios-simulator-screenshot
-        path: screenshot.png
+        name: ios-simulator-screenshots
+        path: |
+          screenshot.png
+          screenshot2.png
         retention-days: 30 
