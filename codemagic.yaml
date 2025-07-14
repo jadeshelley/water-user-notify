@@ -1,0 +1,30 @@
+workflows:
+  ios-workflow:
+    name: iOS Workflow
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter pub get
+      - name: Install iOS dependencies
+        script: |
+          cd ios
+          pod install
+          cd ..
+      - name: Build iOS
+        script: |
+          flutter build ios --simulator
+      - name: Run tests
+        script: |
+          flutter test
+    artifacts:
+      - build/ios/iphoneos/Runner.app
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com 
